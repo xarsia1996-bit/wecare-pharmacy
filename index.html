@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>We Care+ Pharmacy</title>
+    <link rel="manifest" href="data:application/json,{\"name\":\"We Care+ Pharmacy\",\"short_name\":\"WeCare+\",\"start_url\":\".\",\"display\":\"standalone\",\"background_color\":\"#059669\",\"theme_color\":\"#059669\"}">
+    <style>
+        :root {
+            --primary: #059669;
+            --primary-dark: #047857;
+            --bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --text: #1f2937;
+            --text-light: #4b5563;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: var(--bg); color: var(--text); padding-bottom: 70px; }
+
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .lang-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid white;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .container { padding: 1rem; max-width: 600px; margin: 0 auto; }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .nav-tabs {
+            display: flex;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            z-index: 100;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 5px;
+            border: none;
+            background: none;
+            font-size: 0.75rem;
+            color: var(--text-light);
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .tab-btn.active { color: var(--primary); font-weight: bold; }
+
+        .section { display: none; }
+        .section.active { display: block; }
+
+        .badge { display: inline-block; padding: 2px 8px; background: #e0e7ff; color: #3730a3; border-radius: 6px; font-size: 0.8rem; margin-bottom: 6px; }
+        
+        input, select, button.action-btn {
+            width: 100%;
+            padding: 10px;
+            margin: 6px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        
+        button.action-btn {
+            background: var(--primary);
+            color: white;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+        }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 0.85rem; }
+        th { background-color: #f8fafc; }
+        
+        .alert-warning { background-color: #fef3c7; color: #92400e; padding: 8px; border-radius: 6px; font-size: 0.85rem; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div>
+            <h2 id="app-title">We Care+ Pharmacy</h2>
+            <small id="app-subtitle">Φαρμακείο Χρύσια & Χάρης</small>
+        </div>
+        <button class="lang-btn" onclick="toggleLang()" id="lang-toggle">EN</button>
+    </header>
+
+    <div class="container">
+        
+        <!-- ΑΡΧΙΚΗ / ΠΡΟΣΦΟΡΕΣ -->
+        <div id="offers-sec" class="section active">
+            <h3 id="txt-offers-title" style="margin-bottom:10px;">🔥 Προσφορές & Νέα</h3>
+            <div id="offers-list">Φόρτωση προσφορών...</div>
+        </div>
+
+        <!-- ΠΙΕΣΗ -->
+        <div id="bp-sec" class="section">
+            <h3 id="txt-bp-title">❤️ Μέτρηση Πίεσης</h3>
+            <div class="card">
+                <h4 id="txt-bp-guide-title">📖 Οδηγίες Σωστής Μέτρησης</h4>
+                <p id="txt-bp-guide" style="font-size:0.9rem; color: #555; margin-top:5px;">
+                    1. Καθίστε ήσυχα για 5 λεπτά.<br>
+                    2. Μην σταυρώνετε τα πόδια.<br>
+                    3. Το χέρι στο ύψος της καρδιάς.<br>
+                    4. Μην μιλάτε κατά τη μέτρηση.
+                </p>
+            </div>
+            <div class="card">
+                <h4>📝 Καταγραφή Μέτρησης</h4>
+                <input type="number" id="sys" placeholder="Συστολική (Μεγάλη) π.χ. 120">
+                <input type="number" id="dia" placeholder="Διαστολική (Μικρή) π.χ. 80">
+                <input type="number" id="pulse" placeholder="Σφυγμοί π.χ. 72">
+                <button class="action-btn" onclick="addBP()">Αποθήκευση Μέτρησης</button>
+                <div id="bp-alert"></div>
+            </div>
+            <div class="card">
+                <h4>📜 Ιστορικό Πίεσης</h4>
+                <table id="bp-table">
+                    <tr><th>Ημ/νία</th><th>Sys</th><th>Dia</th><th>Παλμοί</th></tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- ΣΑΚΧΑΡΟ -->
+        <div id="sugar-sec" class="section">
+            <h3 id="txt-sugar-title">🩸 Μέτρηση Σακχάρου</h3>
+            <div class="card">
+                <h4>📖 Φυσιολογικές Τιμές</h4>
+                <p style="font-size:0.85rem; color:#555;">
+                    <b>Νηστείας:</b> 70-99 mg/dL (Φυσιολογικό)<br>
+                    <b>Μετά το γεύμα (2 ώρες):</b> &lt; 140 mg/dL
+                </p>
+            </div>
+            <div class="card">
+                <h4>📝 Καταγραφή Σακχάρου</h4>
+                <input type="number" id="sugar-val" placeholder="Τιμή Σακχάρου (mg/dL)">
+                <select id="sugar-type">
+                    <option value="Νηστείας">Νηστείας</option>
+                    <option value="Μετά από γεύμα">Μετά από γεύμα (2 ώρες)</option>
+                </select>
+                <button class="action-btn" onclick="addSugar()">Αποθήκευση Μέτρησης</button>
+                <div id="sugar-alert"></div>
+            </div>
+            <div class="card">
+                <h4>📜 Ιστορικό Σακχάρου</h4>
+                <table id="sugar-table">
+                    <tr><th>Ημ/νία</th><th>Τύπος</th><th>mg/dL</th></tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- ΕΚΔΗΛΩΣΕΙΣ & ΣΥΜΒΟΥΛΕΣ -->
+        <div id="info-sec" class="section">
+            <h3 style="margin-bottom:10px;">📅 Εκδηλώσεις & Συμβουλές</h3>
+            <div id="events-list">Φόρ
